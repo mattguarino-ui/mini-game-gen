@@ -27,7 +27,12 @@ export async function GET(
         // output not available yet
       }
     } else if (status === "failed") {
-      error = "Workflow failed";
+      try {
+        await run.returnValue;
+      } catch (e) {
+        error = e instanceof Error ? e.message : String(e);
+      }
+      if (!error) error = "Workflow failed";
     }
 
     return NextResponse.json({
