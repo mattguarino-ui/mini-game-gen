@@ -27,7 +27,7 @@ async function validateWithSandbox(htmlCode: string): Promise<{ valid: boolean; 
   // Spin up ephemeral Vercel Sandbox compute
   const sandbox = await Sandbox.create({
     runtime: "python3.13",
-    timeout: 30,
+    timeout: 30_000,
   });
 
   try {
