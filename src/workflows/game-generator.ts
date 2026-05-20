@@ -9,7 +9,7 @@ async function callAIGateway(prompt: string): Promise<string> {
 
   const anthropic = createAnthropic({
     baseURL: `${GATEWAY_BASE_URL}/anthropic/v1`,
-    apiKey: process.env.ANTHROPIC_API_KEY ?? "",
+    apiKey: process.env.AI_GATEWAY_KEY ?? "",
   });
 
   const { text } = await generateText({
