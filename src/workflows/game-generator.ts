@@ -1,38 +1,24 @@
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { generateText } from "ai";
 import { Sandbox } from "@vercel/sandbox";
 
 const GATEWAY_BASE_URL = process.env.VERCEL_AI_GATEWAY_URL ?? "https://ai-gateway.vercel.sh";
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? "";
 
 async function callAIGateway(prompt: string): Promise<string> {
   "use step";
 
-  // Route through Vercel AI Gateway
-  const response = await fetch(`${GATEWAY_BASE_URL}/anthropic/v1/messages`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-3-5-haiku-20241022",
-      max_tokens: 4096,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    }),
+  const anthropic = createAnthropic({
+    baseURL: `${GATEWAY_BASE_URL}/anthropic/v1`,
+    apiKey: process.env.ANTHROPIC_API_KEY ?? "",
   });
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`AI Gateway error ${response.status}: ${error}`);
-  }
+  const { text } = await generateText({
+    model: anthropic("claude-3-5-haiku-20241022"),
+    messages: [{ role: "user", content: prompt }],
+    maxOutputTokens: 4096,
+  });
 
-  const data = await response.json();
-  return data.content[0].text;
+  return text;
 }
 
 async function validateWithSandbox(htmlCode: string): Promise<{ valid: boolean; report: string; lineCount: number; hasCanvas: boolean; hasTouchSupport: boolean }> {
